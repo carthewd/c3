@@ -58,7 +58,7 @@ func prList(cmd *cobra.Command, args []string) error {
 		repo, err = gitconfig.GetOrigin()
 	}
 
-	if err != nil {
+	if err != nil || repo == "" {
 		log.Fatal("No CodeCommit repository in current working directory.")
 	}
 

@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-type PR struct {
+type PullRequest struct {
 	ID           string
 	Title        string
 	Owner        string
@@ -13,8 +13,8 @@ type PR struct {
 	DestBranch   string
 }
 
-type PRData struct {
-	PRs []PR
+type PullRequests struct {
+	PRs []PullRequest
 }
 
 type TableData interface {
@@ -22,14 +22,14 @@ type TableData interface {
 	GetRows() [][]string
 }
 
-func (p PRData) GetHeaders() []string {
+func (p PullRequests) GetHeaders() []string {
 	if len(p.PRs) == 0 {
-		var pr []PR
-		emptyPR := PR{
+		var pr []PullRequest
+		emptyPR := PullRequest{
 			ID: "000",
 		}
 		pr = append(pr, emptyPR)
-		pd := PRData{
+		pd := PullRequests{
 			pr,
 		}
 		p = pd
@@ -44,7 +44,7 @@ func (p PRData) GetHeaders() []string {
 	return headers
 }
 
-func (p PRData) GetRows() [][]string {
+func (p PullRequests) GetRows() [][]string {
 	var allRows [][]string
 	for _, pr := range p.PRs {
 		var newRow []string

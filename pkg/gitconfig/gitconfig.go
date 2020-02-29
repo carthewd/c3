@@ -24,7 +24,7 @@ func GetOrigin() (string, error) {
 	args := []string{"config", "remote.origin.url"}
 
 	origin, err := GitCmd(args...)
-	if err != nil {
+	if err != nil || !strings.Contains(origin, "codecommit") {
 		return "", err
 	}
 

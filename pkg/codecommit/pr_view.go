@@ -16,7 +16,7 @@ import (
 )
 
 // ListPRs returns open pull requests for a CodeCommit repository
-func ListPRs(c *codecommit.CodeCommit, repoName string, author string, status string) data.PRData {
+func ListPRs(c *codecommit.CodeCommit, repoName string, author string, status string) data.PullRequests {
 	prInput := &codecommit.ListPullRequestsInput{
 		RepositoryName:    aws.String(repoName),
 		PullRequestStatus: aws.String(status),
@@ -28,7 +28,7 @@ func ListPRs(c *codecommit.CodeCommit, repoName string, author string, status st
 	}
 
 	wg := util.NewBoundWaitGroup(10)
-	var allPRs []data.PR
+	var allPRs []data.PullRequest
 
 	for _, r := range result.PullRequestIds {
 		wg.Add(1)
@@ -45,7 +45,7 @@ func ListPRs(c *codecommit.CodeCommit, repoName string, author string, status st
 	}
 	wg.Wait()
 
-	allPRData := data.PRData{
+	allPRData := data.PullRequests{
 		PRs: allPRs,
 	}
 
@@ -53,8 +53,8 @@ func ListPRs(c *codecommit.CodeCommit, repoName string, author string, status st
 }
 
 // GetPRDetails describes a CodeCommit pull request object in detail
-func GetPRDetails(c *codecommit.CodeCommit, pr string, author string) (data.PR, error) {
-	newPR := data.PR{ID: pr}
+func GetPRDetails(c *codecommit.CodeCommit, pr string, author string) (data.PullRequest, error) {
+	newPR := data.PullRequest{ID: pr}
 
 	prDetailInput := &codecommit.GetPullRequestInput{
 		PullRequestId: aws.String(pr),
