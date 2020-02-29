@@ -1,13 +1,14 @@
 package command
 
 import (
-	"c3/internal/awsclient"
-	"c3/pkg/codecommit"
-	"c3/pkg/gitconfig"
-	"c3/util"
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/carthewd/c3/internal/awsclient"
+	"github.com/carthewd/c3/pkg/codecommit"
+	"github.com/carthewd/c3/pkg/gitconfig"
+	"github.com/carthewd/c3/util"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

@@ -11,8 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/codecommit"
 	log "github.com/sirupsen/logrus"
 
-	"c3/internal/data"
-	"c3/util"
+	"github.com/carthewd/c3/internal/data"
+	"github.com/carthewd/c3/util"
 )
 
 // ListPRs returns open pull requests for a CodeCommit repository

@@ -3,7 +3,7 @@ package util
 import (
 	"fmt"
 
-	"c3/internal/data"
+	"github.com/carthewd/c3/internal/data"
 
 	"github.com/alexeyco/simpletable"
 )

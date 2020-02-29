@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"c3/command"
+	"github.com/carthewd/c3/command"
 )
 
 func main() {
