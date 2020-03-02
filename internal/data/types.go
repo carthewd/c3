@@ -17,6 +17,11 @@ type PullRequests struct {
 	PRs []PullRequest
 }
 
+type PullRequestDiff struct {
+	DestCommit  string
+	MergeCommit string
+}
+
 type TableData interface {
 	GetHeaders() []string
 	GetRows() [][]string

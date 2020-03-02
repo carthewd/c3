@@ -18,8 +18,9 @@ func init() {
 	RootCmd.AddCommand(prCmd)
 	prCmd.AddCommand(prListCmd)
 	prCmd.AddCommand(prCOCmd)
+	prCmd.AddCommand(prDiffCmd)
 
-	prListCmd.Flags().StringP("all", "a", "", "Show all <state> PRs for repository")
+	prListCmd.Flags().StringP("all", "a", "", "Show all <state> pull requests for repository by author (defaults to all)")
 	prListCmd.Flags().StringP("state", "s", "open", "Show all <state> PRs for repository")
 }
 
@@ -34,7 +35,7 @@ A pull request can be supplied using the pull request ID, e.g., "321"`,
 var prListCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"ls", "li"},
-	Short:   "List all PRs for a CodeCommit repository",
+	Short:   "List all pull requests for a CodeCommit repository",
 	RunE:    prList,
 }
 
@@ -44,11 +45,24 @@ var prCOCmd = &cobra.Command{
 	Short:   "Checkout a CodeCommit PR",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			return errors.New("Requires a CodeCommit PR number. ")
+			return errors.New("Requires a CodeCommit pull request number. ")
 		}
 		return nil
 	},
 	RunE: prCheckOut,
+}
+
+var prDiffCmd = &cobra.Command{
+	Use:     "diff [pull request ID]",
+	Aliases: []string{"di"},
+	Short:   "Show a diff for a given pull request",
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("Requires a CodeCommit pull request number. ")
+		}
+		return nil
+	},
+	RunE: prDiff,
 }
 
 func prList(cmd *cobra.Command, args []string) error {
@@ -95,7 +109,6 @@ func prCheckOut(cmd *cobra.Command, args []string) error {
 	gitcmd = append(gitcmd, pr.SourceBranch)
 
 	o, _ := gitconfig.GitCmd(gitcmd...)
-	fmt.Println(o)
 
 	gitcmd = []string{"checkout"}
 	gitcmd = append(gitcmd, pr.SourceBranch)
@@ -106,8 +119,13 @@ func prCheckOut(cmd *cobra.Command, args []string) error {
 	return err
 }
 
-func createPRURL(u string) string {
-	//prURL := fmt.Sprintf("%s/codesuite/codecommit/repositories/%s/pull-requests/%s?region=%s", baseURL, repoName, prID, region)
-	prURL := ""
-	return prURL
+func prDiff(cmd *cobra.Command, args []string) error {
+	c := awsclient.NewClient()
+
+	pr, err := codecommit.GetPRCommits(c, args[0])
+
+	o, _ := gitconfig.GitCmd("diff", pr.DestCommit, pr.MergeCommit, "--color=always")
+
+	fmt.Println(o)
+	return err
 }

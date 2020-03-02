@@ -88,3 +88,24 @@ func GetPRDetails(c *codecommit.CodeCommit, pr string, author string) (data.Pull
 
 	return newPR, nil
 }
+
+func GetPRCommits(c *codecommit.CodeCommit, pr string) (data.PullRequestDiff, error) {
+	prInput := &codecommit.GetPullRequestInput{
+		PullRequestId: aws.String(pr),
+	}
+
+	result, err := c.GetPullRequest(prInput)
+	if err != nil {
+		log.Error(err)
+		return data.PullRequestDiff{}, err
+	}
+
+	prTargets := (*result.PullRequest).PullRequestTargets
+
+	prCommits := data.PullRequestDiff{
+		DestCommit:  *prTargets[0].DestinationCommit,
+		MergeCommit: *prTargets[0].SourceCommit,
+	}
+
+	return prCommits, err
+}

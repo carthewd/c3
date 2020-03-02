@@ -11,9 +11,11 @@ type GitURL struct {
 }
 
 func GitCmd(c ...string) (string, error) {
-	o, err := exec.Command("git", c...).Output()
+	rawOutput := exec.Command("git", c...)
 
+	o, err := rawOutput.Output()
 	output := string(o[:])
+
 	return output, err
 }
 
