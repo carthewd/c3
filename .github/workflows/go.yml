@@ -18,8 +18,7 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
-      - name: Set rel env
-        run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
 
     - name: Get dependencies
       run: |
