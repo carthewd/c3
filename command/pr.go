@@ -1,11 +1,15 @@
 package command
 
 import (
+	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/carthewd/c3/internal/awsclient"
+	"github.com/carthewd/c3/internal/data"
 	"github.com/carthewd/c3/pkg/codecommit"
 	"github.com/carthewd/c3/pkg/gitconfig"
 	"github.com/carthewd/c3/util"
@@ -19,6 +23,7 @@ func init() {
 	prCmd.AddCommand(prListCmd)
 	prCmd.AddCommand(prCOCmd)
 	prCmd.AddCommand(prDiffCmd)
+	prCmd.AddCommand(prCreateCmd)
 
 	prListCmd.Flags().StringP("all", "a", "", "Show all <state> pull requests for repository by author (defaults to all)")
 	prListCmd.Flags().StringP("state", "s", "open", "Show all <state> PRs for repository")
@@ -26,7 +31,7 @@ func init() {
 
 var prCmd = &cobra.Command{
 	Use:   "pr",
-	Short: "View PRs",
+	Short: "Create, view and checkout pull requests.",
 	Long: `Actions to view and manage CodeCommit pull requests.
 	
 A pull request can be supplied using the pull request ID, e.g., "321"`,
@@ -63,6 +68,13 @@ var prDiffCmd = &cobra.Command{
 		return nil
 	},
 	RunE: prDiff,
+}
+
+var prCreateCmd = &cobra.Command{
+	Use:     "create",
+	Aliases: []string{"cr"},
+	Short:   "Create a pull request",
+	RunE:    prCreate,
 }
 
 func prList(cmd *cobra.Command, args []string) error {
@@ -127,5 +139,68 @@ func prDiff(cmd *cobra.Command, args []string) error {
 	o, _ := gitconfig.GitCmd("diff", pr.DestCommit, pr.MergeCommit, "--color=always")
 
 	fmt.Println(o)
+	return err
+}
+
+func prCreate(cmd *cobra.Command, args []string) error {
+	c := awsclient.NewClient()
+
+	newPR := data.NewPullRequest{}
+
+	repo, err := gitconfig.GetOrigin()
+	if err != nil || repo == "" {
+		log.Fatal("No CodeCommit repository in current working directory.")
+	}
+	newPR.Repository = repo
+
+	// Get current working branch
+	srcBranch, _ := gitconfig.GitCmd("rev-parse", "--abbrev-ref", "HEAD")
+
+	// Check branch exists in remote origin (i.e., change has been pushed)
+	o, _ := gitconfig.GitCmd("ls-remote", "-q", "--heads", "origin", srcBranch)
+	if o == "" {
+		log.Fatal("No remote branch found - has your changed been pushed upstream?")
+	}
+
+	o, _ = gitconfig.GitCmd("log", "-1", "--pretty=%B")
+	newPR.Title = strings.Replace(o, "\n\n", "\n", 1)
+
+	prTemplate := fmt.Sprintf(`%s
+# ------------------------ >8 ------------------------
+# Do not modify or remove the line above.
+# Everything below it will be ignored.
+`, newPR.Title)
+
+	text, err := util.OpenInEditor(prTemplate)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var str strings.Builder
+
+	breader := bytes.NewReader(text)
+	bufReader := bufio.NewReader(breader)
+
+	tstr, _, _ := bufReader.ReadLine()
+	newPR.Title = string(tstr)
+
+	for {
+		line, _, err := bufReader.ReadLine()
+		if err == io.EOF {
+			break
+		}
+
+		if strings.Contains(string(line), "# ------------------------ >8 ------------------------") {
+			break
+		}
+		str.WriteString(string(line) + "\n")
+	}
+
+	newPR.Description = str.String()
+
+	result, err := codecommit.CreatePR(c, newPR)
+
+	fmt.Println(util.CreatePullRequestURL(newPR.Repository, result))
+
 	return err
 }

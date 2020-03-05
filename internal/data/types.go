@@ -22,6 +22,14 @@ type PullRequestDiff struct {
 	MergeCommit string
 }
 
+type NewPullRequest struct {
+	Title          string
+	Description    string
+	Repository     string
+	SourceRef      string
+	DestinationRef string
+}
+
 type TableData interface {
 	GetHeaders() []string
 	GetRows() [][]string

@@ -5,7 +5,6 @@ import (
 )
 
 func init() {
-	RootCmd.PersistentFlags().StringP("repo", "R", "", "Select another CodeCommit repository")
 }
 
 var RootCmd = &cobra.Command{
