@@ -1,13 +1,15 @@
 package codecommit
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/codecommit"
 	"github.com/carthewd/c3/internal/data"
 )
 
 func CreatePR(c *codecommit.CodeCommit, newPR data.NewPullRequest) (string, error) {
-	prTargets := make([]*codecommit.Target, 1)
+	var prTargets []*codecommit.Target
 	prTarget := &codecommit.Target{
 		RepositoryName:  aws.String(newPR.Repository),
 		SourceReference: aws.String(newPR.SourceRef),
@@ -21,6 +23,7 @@ func CreatePR(c *codecommit.CodeCommit, newPR data.NewPullRequest) (string, erro
 		Targets:     prTargets,
 	}
 
+	fmt.Println(newPRInput)
 	result, err := c.CreatePullRequest(newPRInput)
 	if err != nil {
 		return "", err

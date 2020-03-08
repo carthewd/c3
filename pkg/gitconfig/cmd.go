@@ -14,6 +14,7 @@ func GitCmd(c ...string) (string, error) {
 	rawOutput := exec.Command("git", c...)
 
 	o, err := rawOutput.Output()
+
 	output := string(o[:])
 
 	return output, err

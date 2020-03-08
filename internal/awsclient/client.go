@@ -5,6 +5,6 @@ import (
 )
 
 // NewClient initializes a new AWS Code Commit client
-func NewClient() *codecommit.CodeCommit {
-	return codecommit.New(NewSession(""))
+func NewClient(profile string) *codecommit.CodeCommit {
+	return codecommit.New(NewSession(profile))
 }

@@ -30,6 +30,11 @@ type NewPullRequest struct {
 	DestinationRef string
 }
 
+type Path struct {
+	Path     string
+	PathType string
+}
+
 type TableData interface {
 	GetHeaders() []string
 	GetRows() [][]string

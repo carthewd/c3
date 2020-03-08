@@ -5,6 +5,7 @@ import (
 )
 
 func init() {
+	RootCmd.PersistentFlags().StringP("profile", "p", "", "AWS profile to use (from shared credentials file)")
 }
 
 var RootCmd = &cobra.Command{

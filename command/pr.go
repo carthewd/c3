@@ -78,12 +78,7 @@ var prCreateCmd = &cobra.Command{
 }
 
 func prList(cmd *cobra.Command, args []string) error {
-	var repo string
-	err := error(nil)
-
-	if repo, err = cmd.Flags().GetString("repo"); err == nil && repo == "" {
-		repo, err = gitconfig.GetOrigin()
-	}
+	repo, err := gitconfig.GetOrigin()
 
 	if err != nil || repo == "" {
 		log.Fatal("No CodeCommit repository in current working directory.")
@@ -100,7 +95,8 @@ func prList(cmd *cobra.Command, args []string) error {
 	}
 	state = strings.ToUpper(state)
 
-	c := awsclient.NewClient()
+	profile, err := cmd.Flags().GetString("profile")
+	c := awsclient.NewClient(profile)
 
 	prs := codecommit.ListPRs(c, repo, author, state)
 	util.PrintTable(prs)
@@ -114,7 +110,9 @@ func prCheckOut(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	c := awsclient.NewClient()
+	profile, err := cmd.Flags().GetString("profile")
+	c := awsclient.NewClient(profile)
+
 	pr, err := codecommit.GetPRDetails(c, args[0], "")
 
 	gitcmd := []string{fmt.Sprintf(`{"fetch", "remote", %q}`, pr.SourceBranch)}
@@ -132,7 +130,9 @@ func prCheckOut(cmd *cobra.Command, args []string) error {
 }
 
 func prDiff(cmd *cobra.Command, args []string) error {
-	c := awsclient.NewClient()
+	profile, err := cmd.Flags().GetString("profile")
+
+	c := awsclient.NewClient(profile)
 
 	pr, err := codecommit.GetPRCommits(c, args[0])
 
@@ -143,7 +143,9 @@ func prDiff(cmd *cobra.Command, args []string) error {
 }
 
 func prCreate(cmd *cobra.Command, args []string) error {
-	c := awsclient.NewClient()
+	profile, err := cmd.Flags().GetString("profile")
+
+	c := awsclient.NewClient(profile)
 
 	newPR := data.NewPullRequest{}
 
@@ -157,10 +159,14 @@ func prCreate(cmd *cobra.Command, args []string) error {
 	srcBranch, _ := gitconfig.GitCmd("rev-parse", "--abbrev-ref", "HEAD")
 
 	// Check branch exists in remote origin (i.e., change has been pushed)
+	srcBranch = strings.Replace(srcBranch, "\n", "", 1)
 	o, _ := gitconfig.GitCmd("ls-remote", "-q", "--heads", "origin", srcBranch)
+
 	if o == "" {
 		log.Fatal("No remote branch found - has your changed been pushed upstream?")
 	}
+
+	newPR.SourceRef = srcBranch
 
 	o, _ = gitconfig.GitCmd("log", "-1", "--pretty=%B")
 	newPR.Title = strings.Replace(o, "\n\n", "\n", 1)
