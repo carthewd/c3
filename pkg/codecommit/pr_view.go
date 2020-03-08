@@ -89,6 +89,7 @@ func GetPRDetails(c *codecommit.CodeCommit, pr string, author string) (data.Pull
 	return newPR, nil
 }
 
+// GetPRCommits uses the CodeCommit API to get relevant commit hashes for a diff
 func GetPRCommits(c *codecommit.CodeCommit, pr string) (data.PullRequestDiff, error) {
 	prInput := &codecommit.GetPullRequestInput{
 		PullRequestId: aws.String(pr),

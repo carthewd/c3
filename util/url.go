@@ -9,6 +9,7 @@ import (
 	"github.com/carthewd/c3/pkg/gitconfig"
 )
 
+// CreatePullRequestURL generates CodeCommit console URLs
 func CreatePullRequestURL(repo string, prID string) string {
 	region := os.Getenv("AWS_REGION")
 	if region == "" {
@@ -20,6 +21,7 @@ func CreatePullRequestURL(repo string, prID string) string {
 	return url
 }
 
+// CreatePathURL generates CodeCommit console URLs from filenames
 func CreatePathURL(p data.Path) string {
 	region := os.Getenv("AWS_REGION")
 	if region == "" {

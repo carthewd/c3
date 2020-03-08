@@ -4,6 +4,7 @@ import (
 	"reflect"
 )
 
+// PullRequest describes a CodeCommit pull request
 type PullRequest struct {
 	ID           string
 	Title        string
@@ -13,15 +14,18 @@ type PullRequest struct {
 	DestBranch   string
 }
 
+// PullRequests is a list of PullRequest
 type PullRequests struct {
 	PRs []PullRequest
 }
 
+// PullRequestDiff describes fields for diff operations
 type PullRequestDiff struct {
 	DestCommit  string
 	MergeCommit string
 }
 
+// NewPullRequest describes a new pull request to be created
 type NewPullRequest struct {
 	Title          string
 	Description    string
@@ -30,16 +34,19 @@ type NewPullRequest struct {
 	DestinationRef string
 }
 
+// Path describes fields used to identify a git filesystem object
 type Path struct {
 	Path     string
 	PathType string
 }
 
+// TableData Interface for dynamically creating tables with table_maker.go
 type TableData interface {
 	GetHeaders() []string
 	GetRows() [][]string
 }
 
+// GetHeaders implements the TableData interface to generate tables for PullRequest objects
 func (p PullRequests) GetHeaders() []string {
 	if len(p.PRs) == 0 {
 		var pr []PullRequest
@@ -62,6 +69,7 @@ func (p PullRequests) GetHeaders() []string {
 	return headers
 }
 
+// GetRows implements the TableData interface to generate tables for PullRequest objects
 func (p PullRequests) GetRows() [][]string {
 	var allRows [][]string
 	for _, pr := range p.PRs {

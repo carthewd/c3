@@ -6,8 +6,11 @@ import (
 	"os/exec"
 )
 
+// DefaultEditor specifies the default text editor used when creating pull requests
 const DefaultEditor = "vim"
 
+// OpenInEditor opens a new temporary file for editing, optionally pre-adding text as a template.
+// Returns a byte slice of the final text file
 func OpenInEditor(template string) ([]byte, error) {
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
@@ -21,7 +24,7 @@ func OpenInEditor(template string) ([]byte, error) {
 
 	filename := file.Name()
 
-	// Defer removal of the temporary file in case any of the next steps fail.
+	// Defer removal of the temporary file in case of any failures
 	defer os.Remove(filename)
 
 	if err = file.Close(); err != nil {

@@ -8,6 +8,8 @@ import (
 	"github.com/alexeyco/simpletable"
 )
 
+// PrintTable will print data strcutures using struct fields as headers
+// and slice data as rows
 func PrintTable(t data.TableData) {
 	table := simpletable.New()
 
