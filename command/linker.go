@@ -47,23 +47,22 @@ func createLink(cmd *cobra.Command, args []string) error {
 			log.Fatal("No CodeCommit repository in current working directory.")
 		}
 		url = util.CreatePullRequestURL(repo, parsedArgs[1])
-
-		return err
-	}
-	info, err := os.Stat(parsedArgs[0])
-	if os.IsNotExist(err) {
-		log.Fatal("No such file or directory")
-	}
-
-	fp := data.Path{}
-	if info.IsDir() {
-		fp.PathType = "dir"
 	} else {
-		fp.PathType = "file"
-	}
+		info, err := os.Stat(parsedArgs[0])
+		if os.IsNotExist(err) {
+			log.Fatal("No such file or directory")
+		}
 
-	fp.Path = args[0]
-	url = util.CreatePathURL(fp)
+		fp := data.Path{}
+		if info.IsDir() {
+			fp.PathType = "dir"
+		} else {
+			fp.PathType = "file"
+		}
+
+		fp.Path = args[0]
+		url = util.CreatePathURL(fp)
+	}
 
 	fmt.Println(url)
 

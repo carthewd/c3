@@ -5,7 +5,7 @@ This is still in the very early stages of development
 
 ## Usage 
 
-- `c3 pr [checkout, create, diff list]`
+- `c3 pr [checkout, create, diff, list]`
 - `c3 link [filepath | pr:123]`
 
 ## Installation
