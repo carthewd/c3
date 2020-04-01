@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-
 	"github.com/carthewd/c3/command"
 )
 

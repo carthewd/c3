@@ -25,7 +25,7 @@ func init() {
 	prCmd.AddCommand(prDiffCmd)
 	prCmd.AddCommand(prCreateCmd)
 
-	prListCmd.Flags().StringP("all", "a", "", "Show all <state> pull requests for repository by author (defaults to all)")
+	prListCmd.Flags().StringP("author", "a", "", "Show <state> pull requests for repository by author (defaults to all)")
 	prListCmd.Flags().StringP("state", "s", "open", "Show all <state> PRs for repository")
 }
 
@@ -84,7 +84,7 @@ func prList(cmd *cobra.Command, args []string) error {
 		log.Fatal("No CodeCommit repository in current working directory.")
 	}
 
-	author, err := cmd.Flags().GetString("all")
+	author, err := cmd.Flags().GetString("author")
 	if err != nil {
 		return err
 	}
@@ -136,6 +136,7 @@ func prDiff(cmd *cobra.Command, args []string) error {
 
 	pr, err := codecommit.GetPRCommits(c, args[0])
 
+	_ = []string{fmt.Sprintf(`{"fetch", "remote", %q}`, pr.SourceBranch)}
 	o, _ := gitconfig.GitCmd("diff", pr.DestCommit, pr.MergeCommit, "--color=always")
 
 	fmt.Println(o)

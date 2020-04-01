@@ -21,8 +21,9 @@ type PullRequests struct {
 
 // PullRequestDiff describes fields for diff operations
 type PullRequestDiff struct {
-	DestCommit  string
-	MergeCommit string
+	DestCommit   string
+	MergeCommit  string
+	SourceBranch string
 }
 
 // NewPullRequest describes a new pull request to be created

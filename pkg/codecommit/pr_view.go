@@ -9,6 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/service/codecommit"
+	"github.com/aws/aws-sdk-go/service/codecommit/codecommitiface"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/carthewd/c3/internal/data"
@@ -16,7 +18,7 @@ import (
 )
 
 // ListPRs returns open pull requests for a CodeCommit repository
-func ListPRs(c *codecommit.CodeCommit, repoName string, author string, status string) data.PullRequests {
+func ListPRs(c codecommitiface.CodeCommitAPI, repoName string, author string, status string) data.PullRequests {
 	prInput := &codecommit.ListPullRequestsInput{
 		RepositoryName:    aws.String(repoName),
 		PullRequestStatus: aws.String(status),
@@ -32,7 +34,7 @@ func ListPRs(c *codecommit.CodeCommit, repoName string, author string, status st
 
 	for _, r := range result.PullRequestIds {
 		wg.Add(1)
-		go func(c *codecommit.CodeCommit, pr string) {
+		go func(c codecommitiface.CodeCommitAPI, pr string) {
 			defer wg.Done()
 			newPR, err := GetPRDetails(c, pr, author)
 
@@ -53,7 +55,7 @@ func ListPRs(c *codecommit.CodeCommit, repoName string, author string, status st
 }
 
 // GetPRDetails describes a CodeCommit pull request object in detail
-func GetPRDetails(c *codecommit.CodeCommit, pr string, author string) (data.PullRequest, error) {
+func GetPRDetails(c codecommitiface.CodeCommitAPI, pr string, author string) (data.PullRequest, error) {
 	newPR := data.PullRequest{ID: pr}
 
 	prDetailInput := &codecommit.GetPullRequestInput{
@@ -90,7 +92,7 @@ func GetPRDetails(c *codecommit.CodeCommit, pr string, author string) (data.Pull
 }
 
 // GetPRCommits uses the CodeCommit API to get relevant commit hashes for a diff
-func GetPRCommits(c *codecommit.CodeCommit, pr string) (data.PullRequestDiff, error) {
+func GetPRCommits(c codecommitiface.CodeCommitAPI, pr string) (data.PullRequestDiff, error) {
 	prInput := &codecommit.GetPullRequestInput{
 		PullRequestId: aws.String(pr),
 	}
@@ -106,6 +108,7 @@ func GetPRCommits(c *codecommit.CodeCommit, pr string) (data.PullRequestDiff, er
 	prCommits := data.PullRequestDiff{
 		DestCommit:  *prTargets[0].DestinationCommit,
 		MergeCommit: *prTargets[0].SourceCommit,
+		SourceBranch: strings.Replace(*prTargets[0].SourceReference, "refs/heads/", "", -1),
 	}
 
 	return prCommits, err

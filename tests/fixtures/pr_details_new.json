@@ -1,0 +1,74 @@
+[
+  {
+    "pullRequest": {
+      "authorArn": "arn:aws:iam::111111111111:user/Jane_Doe",
+      "title": "Pronunciation difficulty analyzer",
+      "pullRequestTargets": [
+        {
+          "destinationReference": "refs/heads/master",
+          "destinationCommit": "5d036259EXAMPLE",
+          "sourceReference": "refs/heads/jane-branch",
+          "sourceCommit": "317f8570EXAMPLE",
+          "repositoryName": "MyDemoRepo",
+          "mergeMetadata": {
+            "isMerged": false
+          }
+        }
+      ],
+      "lastActivityDate": "2006-01-02T15:04:05Z",
+      "pullRequestId": "2",
+      "clientRequestToken": "123Example",
+      "pullRequestStatus": "OPEN",
+      "creationDate": "2006-01-02T15:04:05Z",
+      "description": "A code review of the new feature I just added to the service."
+    }
+  },
+  {
+    "pullRequest": {
+      "authorArn": "arn:aws:iam::111111111111:user/John_Smith",
+      "title": "Build Beowulf cluster",
+      "pullRequestTargets": [
+        {
+          "destinationReference": "refs/heads/master",
+          "destinationCommit": "5d036259EXAMPLE",
+          "sourceReference": "refs/heads/john-branch",
+          "sourceCommit": "317f8570EXAMPLE",
+          "repositoryName": "MyDemoRepo",
+          "mergeMetadata": {
+            "isMerged": false
+          }
+        }
+      ],
+      "lastActivityDate": "2006-01-02T15:04:05Z",
+      "pullRequestId": "12",
+      "clientRequestToken": "123Example",
+      "pullRequestStatus": "OPEN",
+      "creationDate": "2006-01-02T15:04:05Z",
+      "description": "A code review of the new feature I just added to the service."
+    }
+  },
+  {
+    "pullRequest": {
+      "authorArn": "arn:aws:iam::111111111111:user/Cthulhu",
+      "title": "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
+      "pullRequestTargets": [
+        {
+          "destinationReference": "refs/heads/master",
+          "destinationCommit": "5d036259EXAMPLE",
+          "sourceReference": "refs/heads/cthulhu-branch",
+          "sourceCommit": "317f8570EXAMPLE",
+          "repositoryName": "MyDemoRepo",
+          "mergeMetadata": {
+            "isMerged": false
+          }
+        }
+      ],
+      "lastActivityDate": "2006-01-02T15:04:05Z",
+      "pullRequestId": "16",
+      "clientRequestToken": "123Example",
+      "pullRequestStatus": "OPEN",
+      "creationDate": "2006-01-02T15:04:05Z",
+      "description": "A code review of the new feature I just added to the service."
+    }
+  }
+]
