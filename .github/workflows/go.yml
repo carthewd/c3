@@ -40,8 +40,6 @@ jobs:
         GOARCH: amd64
         GOOS: darwin
       run: |
-        go clean -testcache
-        go test ./...
         go build -v -trimpath -o c3-${{ env.RELEASE_VERSION }}-darwin-amd64 ./cmd/c3
 
     - name: Create Release
