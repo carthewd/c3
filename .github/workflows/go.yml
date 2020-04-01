@@ -31,13 +31,17 @@ jobs:
       env:
         GOARCH: amd64
         GOOS: linux
-      run: go build -v -trimpath -o c3-${{ env.RELEASE_VERSION }}-linux-amd64 ./cmd/c3
+      run: |
+        go test ./...
+        go build -v -trimpath -o c3-${{ env.RELEASE_VERSION }}-linux-amd64 ./cmd/c3
 
     - name: Build MacOS
       env:
         GOARCH: amd64
         GOOS: darwin
-      run: go build -v -trimpath -o c3-${{ env.RELEASE_VERSION }}-darwin-amd64 ./cmd/c3
+      run: |
+        go test ./...
+        go build -v -trimpath -o c3-${{ env.RELEASE_VERSION }}-darwin-amd64 ./cmd/c3
 
     - name: Create Release
       id: create_release
