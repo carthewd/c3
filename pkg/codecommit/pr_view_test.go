@@ -122,7 +122,7 @@ func Test_PRView(t *testing.T) {
 
 			actual, err := GetPRCommits(svc, test.Args)
 			if err != nil {
-				t.Errorf("unexpected error occured: %s", err)
+				t.Errorf("unexpected error occurred: %s", err)
 			}
 
 			if actual != test.Output {

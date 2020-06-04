@@ -24,6 +24,8 @@ func init() {
 	prCmd.AddCommand(prCOCmd)
 	prCmd.AddCommand(prDiffCmd)
 	prCmd.AddCommand(prCreateCmd)
+	prCmd.AddCommand(prApprovalCmd)
+	prCmd.AddCommand(prRevokeCmd)
 
 	prListCmd.Flags().StringP("author", "a", "", "Show <state> pull requests for repository by author (defaults to all)")
 	prListCmd.Flags().StringP("state", "s", "open", "Show all <state> PRs for repository")
@@ -68,6 +70,32 @@ var prDiffCmd = &cobra.Command{
 		return nil
 	},
 	RunE: prDiff,
+}
+
+var prApprovalCmd = &cobra.Command{
+	Use:     "approve [pull request ID]",
+	Aliases: []string{"app", "appr", "a"},
+	Short:   "Show a diff for a given pull request",
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("Requires a CodeCommit pull request number. ")
+		}
+		return nil
+	},
+	RunE: prApprove,
+}
+
+var prRevokeCmd = &cobra.Command{
+	Use:     "revoke [pull request ID]",
+	Aliases: []string{"rev", "re", "r"},
+	Short:   "Show a diff for a given pull request",
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("Requires a CodeCommit pull request number. ")
+		}
+		return nil
+	},
+	RunE: prRevoke,
 }
 
 var prCreateCmd = &cobra.Command{
@@ -136,7 +164,7 @@ func prDiff(cmd *cobra.Command, args []string) error {
 
 	pr, err := codecommit.GetPRCommits(c, args[0])
 
-	_ = []string{fmt.Sprintf(`{"fetch", "remote", %q}`, pr.SourceBranch)}
+	_,_ = gitconfig.GitCmd("fetch", "origin", pr.SourceBranch)
 	o, _ := gitconfig.GitCmd("diff", pr.DestCommit, pr.MergeCommit, "--color=always")
 
 	fmt.Println(o)
@@ -164,7 +192,7 @@ func prCreate(cmd *cobra.Command, args []string) error {
 	o, _ := gitconfig.GitCmd("ls-remote", "-q", "--heads", "origin", srcBranch)
 
 	if o == "" {
-		log.Fatal("No remote branch found - has your changed been pushed upstream?")
+		log.Fatal("No remote branch found - has your change been pushed upstream?")
 	}
 
 	newPR.SourceRef = srcBranch
@@ -209,5 +237,41 @@ func prCreate(cmd *cobra.Command, args []string) error {
 
 	fmt.Println(util.CreatePullRequestURL(newPR.Repository, result))
 
+	return err
+}
+
+func prApprove(cmd *cobra.Command, args []string) error {
+	profile, err := cmd.Flags().GetString("profile")
+	if err != nil {
+		return err
+	}
+
+	c := awsclient.NewClient(profile)
+
+	err = codecommit.ApprovePR(c, args[0])
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Pull request %s approved.\n", args[0])
+	return err
+}
+
+func prRevoke(cmd *cobra.Command, args []string) error {
+	profile, err := cmd.Flags().GetString("profile")
+	if err != nil {
+		return err
+	}
+
+	c := awsclient.NewClient(profile)
+
+	err = codecommit.RevokePR(c, args[0])
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Pull request %s approval revoked.\n", args[0])
 	return err
 }
