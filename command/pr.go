@@ -164,7 +164,7 @@ func prDiff(cmd *cobra.Command, args []string) error {
 
 	pr, err := codecommit.GetPRCommits(c, args[0])
 
-	_,_ = gitconfig.GitCmd("fetch", "origin", pr.SourceBranch)
+	_, _ = gitconfig.GitCmd("fetch", "origin", pr.SourceBranch)
 	o, _ := gitconfig.GitCmd("diff", pr.DestCommit, pr.MergeCommit, "--color=always")
 
 	fmt.Println(o)
@@ -232,6 +232,11 @@ func prCreate(cmd *cobra.Command, args []string) error {
 	}
 
 	newPR.Description = str.String()
+	if strings.Contains(newPR.Description, "# Do not modify or remove the line above.") {
+		log.Fatal("Empty description - not creating pull request.")
+	} else if newPR.Description == "" {
+		log.Fatal("Empty description - not creating pull request.")
+	}
 
 	result, err := codecommit.CreatePR(c, newPR)
 
