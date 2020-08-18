@@ -41,6 +41,23 @@ type Path struct {
 	PathType string
 }
 
+type MergeOptions struct {
+	FF       bool
+	Squash   bool
+	ThreeWay bool
+}
+
+type MergeInput struct {
+	Type               string
+	PRID               string
+	SourceCommit       string
+	Repository         string
+	ConflictDetail     string
+	ConflictResolution string
+	AuthorName         string
+	AuthorEmail        string
+}
+
 // TableData Interface for dynamically creating tables with table_maker.go
 type TableData interface {
 	GetHeaders() []string
