@@ -79,7 +79,7 @@ func mergeSquash(c *codecommit.CodeCommit, m *codecommit.MergePullRequestBySquas
 	return mergeResult, err
 }
 
-func mergeThreeWay(c *codecommit.CodeCommit, m *codecommit.MergePullRequestBySquashInput) (*codecommit.MergePullRequestByThreeWayOutput, error) {
+func mergeThreeWay(c *codecommit.CodeCommit, m *codecommit.MergePullRequestByThreeWayInput) (*codecommit.MergePullRequestByThreeWayOutput, error) {
 	mergeResult, err := c.MergePullRequestByThreeWay(m)
 	if err != nil {
 		return mergeResult, err

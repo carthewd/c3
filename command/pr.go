@@ -75,7 +75,7 @@ var prDiffCmd = &cobra.Command{
 var prApprovalCmd = &cobra.Command{
 	Use:     "approve [pull request ID]",
 	Aliases: []string{"app", "appr", "a"},
-	Short:   "Show a diff for a given pull request",
+	Short:   "Approve a pull request",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("Requires a CodeCommit pull request number. ")
@@ -88,7 +88,7 @@ var prApprovalCmd = &cobra.Command{
 var prRevokeCmd = &cobra.Command{
 	Use:     "revoke [pull request ID]",
 	Aliases: []string{"rev", "re", "r"},
-	Short:   "Show a diff for a given pull request",
+	Short:   "Revoke a pull request",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("Requires a CodeCommit pull request number. ")
