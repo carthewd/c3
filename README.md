@@ -5,6 +5,8 @@ Inspired in part by hub and the GitHub CLI.
 
 This is still in the very early stages of development 
 
+[![asciicast](https://asciinema.org/a/357519.svg)](https://asciinema.org/a/357519)
+
 ## Usage 
 
 - `c3 pr [approve, checkout, create, diff, list, revoke]`
@@ -16,18 +18,20 @@ Prebuilt binaries (macOS and Linux) from [releases page][]
 
 ### Build from source 
 0. Prerequisites
-git
+* git
 
 1. Clone the repository
-``` git clone git@github.com:carthewd/c3.git
+```
+git clone git@github.com:carthewd/c3.git
 cd c3
 ```
 
 2. Build the project
+
 ``` make ```
-[releases page]: https://github.com/carthewd/c3/releases/latest
 
 3. Move the `c3` binary somewhere in your path
+
 ``` mv c3 /usr/local/bin/ ```
 
 OR
