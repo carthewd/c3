@@ -1,5 +1,5 @@
 # c3 - CodeCommit CLI
-`c3` is a tool which provides AWS CodeCommit functionality from the command line. 
+`c3` is a tool which provides AWS CodeCommit functionality from the command line. This was born from working on a project which moved from Github to CodeCommit and feeling some pain with the CodeCommit console experience, alongside an interest in learning Go (and building useful, practical things is a good way to learn). 
 
 Inspired in part by hub and the GitHub CLI. 
 
