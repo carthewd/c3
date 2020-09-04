@@ -5,7 +5,7 @@ Inspired in part by hub and the GitHub CLI.
 
 This is still in the very early stages of development 
 
-[![asciicast](https://asciinema.org/a/357519.svg)](https://asciinema.org/a/357519)
+![](docs/c3.gif)
 
 ## Usage 
 
