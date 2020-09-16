@@ -48,7 +48,7 @@ func Merge(c *codecommit.CodeCommit, m data.MergeInput) error {
 		}
 		mergeSquash(c, squashMergeInput)
 	case "ThreeWay":
-		threeWayMergeInput := &codecommit.MergePullRequestBySquashInput{
+		threeWayMergeInput := &codecommit.MergePullRequestByThreeWayInput{
 			PullRequestId:  aws.String(m.PRID),
 			RepositoryName: aws.String(m.Repository),
 			SourceCommitId: aws.String(m.SourceCommit),
