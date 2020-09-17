@@ -26,9 +26,12 @@ func init() {
 	prCmd.AddCommand(prCreateCmd)
 	prCmd.AddCommand(prApprovalCmd)
 	prCmd.AddCommand(prRevokeCmd)
+	prCmd.AddCommand(prMergeCmd)
 
 	prListCmd.Flags().StringP("author", "a", "", "Show <state> pull requests for repository by author (defaults to all)")
 	prListCmd.Flags().StringP("state", "s", "open", "Show all <state> PRs for repository")
+
+	prMergeCmd.Flags().BoolP("delete-branch", "d", true, "Delete the remote branch after a successful merge")
 }
 
 var prCmd = &cobra.Command{
@@ -103,6 +106,19 @@ var prCreateCmd = &cobra.Command{
 	Aliases: []string{"cr"},
 	Short:   "Create a pull request",
 	RunE:    prCreate,
+}
+
+var prMergeCmd = &cobra.Command{
+	Use:	 "merge [pull request ID]",
+	Aliases: []string{"m", "mr"},
+	Short:	 "Merge a pull request",
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("Requires a CodeCommit pull request number. ")
+		}
+		return nil
+	},
+	RunE:	 prMerge,
 }
 
 func prList(cmd *cobra.Command, args []string) error {
@@ -279,4 +295,55 @@ func prRevoke(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Pull request %s approval revoked.\n", args[0])
 	return err
+}
+
+func prMerge(cmd *cobra.Command, args []string) error {
+	profile, err := cmd.Flags().GetString("profile")
+	if err != nil {
+		return err
+	}
+
+	c := awsclient.NewClient(profile)
+
+	pr, err := codecommit.GetPRDetails(c, args[0], "")
+	if err != nil {
+		return err
+	}
+
+	repo, err := gitconfig.GetOrigin()
+	if err != nil {
+		return err
+	}
+
+	opts, _ := codecommit.MergeOptions(c, pr, repo)
+
+	d, err := cmd.Flags().GetBool("delete-branch")
+	if err != nil {
+		return err
+	}
+
+	mergeInput := data.MergeInput{
+		PRID: pr.ID,
+		Repository: repo,
+		SourceBranch: pr.SourceBranch,
+		DeleteBranch: d,
+	}
+
+	if opts.FF {
+		mergeInput.Type = "FF"
+	} else if opts.ThreeWay {
+		mergeInput.Type = "ThreeWay"
+		log.Fatal("Only FastForward merge supported.")
+	} else if opts.Squash {
+		mergeInput.Type = "Squash"
+		log.Fatal("Only FastForward merge supported.")
+	} else {
+		log.Fatal("No viable merge strategies - resolve conflicts and try again.")
+	}
+
+	_ = codecommit.Merge(c, mergeInput)
+
+	fmt.Printf("Pull request %s merged successfully.\n", pr.ID)
+
+	return nil
 }

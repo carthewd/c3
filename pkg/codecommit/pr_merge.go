@@ -1,6 +1,7 @@
 package codecommit
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/codecommit"
 	"github.com/carthewd/c3/internal/data"
@@ -15,7 +16,12 @@ func MergeOptions(c *codecommit.CodeCommit, pr data.PullRequest, repoName string
 
 	mergeOpts, err := c.GetMergeOptions(mergeOptInput)
 
-	availMergeOpt := data.MergeOptions{}
+	availMergeOpt := data.MergeOptions{
+		FF:       false,
+		Squash:   false,
+		ThreeWay: false,
+	}
+
 	for _, option := range mergeOpts.MergeOptions {
 		if *option == "FAST_FORWARD_MERGE" {
 			availMergeOpt.FF = true
@@ -35,9 +41,21 @@ func Merge(c *codecommit.CodeCommit, m data.MergeInput) error {
 		fastForwardInput := &codecommit.MergePullRequestByFastForwardInput{
 			PullRequestId:  aws.String(m.PRID),
 			RepositoryName: aws.String(m.Repository),
-			SourceCommitId: aws.String(m.SourceCommit),
 		}
 		mergeFF(c, fastForwardInput)
+
+		if m.DeleteBranch {
+			deleteInput := &codecommit.DeleteBranchInput{
+				RepositoryName: aws.String(m.Repository),
+				BranchName: aws.String(m.SourceBranch),
+			}
+
+			_, err := c.DeleteBranch(deleteInput)
+
+			return err
+		}
+
+		return nil
 	case "Squash":
 		squashMergeInput := &codecommit.MergePullRequestBySquashInput{
 			PullRequestId:  aws.String(m.PRID),

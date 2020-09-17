@@ -51,11 +51,13 @@ type MergeInput struct {
 	Type               string
 	PRID               string
 	SourceCommit       string
+	SourceBranch	   string
 	Repository         string
 	ConflictDetail     string
 	ConflictResolution string
 	AuthorName         string
 	AuthorEmail        string
+	DeleteBranch 	   bool
 }
 
 // TableData Interface for dynamically creating tables with table_maker.go
