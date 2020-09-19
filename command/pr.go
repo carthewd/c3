@@ -18,6 +18,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var fastForward bool
+
 func init() {
 	RootCmd.AddCommand(prCmd)
 	prCmd.AddCommand(prListCmd)
@@ -32,6 +34,9 @@ func init() {
 	prListCmd.Flags().StringP("state", "s", "open", "Show all <state> PRs for repository")
 
 	prMergeCmd.Flags().BoolP("delete-branch", "d", true, "Delete the remote branch after a successful merge")
+	prMergeCmd.Flags().BoolVarP(&fastForward, "fast-forward", "f", true, "Fast forward merge")
+	prMergeCmd.Flags().BoolP("squash", "s", false, "Squash merge")
+	prMergeCmd.Flags().BoolP("threeway", "t", false, "Threeway merge")
 }
 
 var prCmd = &cobra.Command{
@@ -109,16 +114,38 @@ var prCreateCmd = &cobra.Command{
 }
 
 var prMergeCmd = &cobra.Command{
-	Use:	 "merge [pull request ID]",
+	Use:     "merge [pull request ID]",
 	Aliases: []string{"m", "mr"},
-	Short:	 "Merge a pull request",
+	Short:   "Merge a pull request",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("Requires a CodeCommit pull request number. ")
 		}
+
+		mergeTypes := 0
+		if flag, _ := cmd.Flags().GetBool("squash"); flag {
+			fastForward = false
+			mergeTypes++
+		}
+
+		if flag, _ := cmd.Flags().GetBool("threeway"); flag {
+			fastForward = false
+			mergeTypes++
+		}
+
+		if flag, _ := cmd.Flags().GetBool("fast-forward"); flag {
+			mergeTypes++
+		}
+
+		if mergeTypes > 1 {
+			log.Fatal("Only one option is valid: --fast-forward, --squash, --threeway")
+		} else if mergeTypes == 0 {
+			log.Fatal("No merge strategy selected")
+		}
+
 		return nil
 	},
-	RunE:	 prMerge,
+	RunE: prMerge,
 }
 
 func prList(cmd *cobra.Command, args []string) error {
@@ -323,18 +350,18 @@ func prMerge(cmd *cobra.Command, args []string) error {
 	}
 
 	mergeInput := data.MergeInput{
-		PRID: pr.ID,
-		Repository: repo,
+		PRID:         pr.ID,
+		Repository:   repo,
 		SourceBranch: pr.SourceBranch,
 		DeleteBranch: d,
 	}
 
-	if opts.FF {
+	if flag, _ := cmd.Flags().GetBool("fast-forward"); flag && opts.FF {
 		mergeInput.Type = "FF"
-	} else if opts.ThreeWay {
+	} else if flag, _ := cmd.Flags().GetBool("threeway"); flag && opts.ThreeWay {
 		mergeInput.Type = "ThreeWay"
 		log.Fatal("Only FastForward merge supported.")
-	} else if opts.Squash {
+	} else if flag, _ := cmd.Flags().GetBool("squash"); flag && opts.Squash {
 		mergeInput.Type = "Squash"
 		log.Fatal("Only FastForward merge supported.")
 	} else {
