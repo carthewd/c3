@@ -365,7 +365,17 @@ func prMerge(cmd *cobra.Command, args []string) error {
 		mergeInput.Type = "Squash"
 		log.Fatal("Only FastForward merge supported.")
 	} else {
-		log.Fatal("No viable merge strategies - resolve conflicts and try again.")
+		var availOpts []string
+		if opts.FF {
+			availOpts = append(availOpts, "fast-forward")
+		}
+		if opts.ThreeWay {
+			availOpts = append(availOpts, "threeway")
+		}
+		if opts.Squash {
+			availOpts = append(availOpts, "squash")
+		}
+		log.Fatalf("Invalid merge strategy - resolve conflicts or choose another strategy and try again. The following are available: %v", availOpts)
 	}
 
 	_ = codecommit.Merge(c, mergeInput)
