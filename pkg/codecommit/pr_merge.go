@@ -1,7 +1,6 @@
 package codecommit
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/codecommit"
 	"github.com/carthewd/c3/internal/data"
@@ -47,7 +46,7 @@ func Merge(c *codecommit.CodeCommit, m data.MergeInput) error {
 		if m.DeleteBranch {
 			deleteInput := &codecommit.DeleteBranchInput{
 				RepositoryName: aws.String(m.Repository),
-				BranchName: aws.String(m.SourceBranch),
+				BranchName:     aws.String(m.SourceBranch),
 			}
 
 			_, err := c.DeleteBranch(deleteInput)
@@ -60,18 +59,12 @@ func Merge(c *codecommit.CodeCommit, m data.MergeInput) error {
 		squashMergeInput := &codecommit.MergePullRequestBySquashInput{
 			PullRequestId:  aws.String(m.PRID),
 			RepositoryName: aws.String(m.Repository),
-			SourceCommitId: aws.String(m.SourceCommit),
-			AuthorName:     aws.String(m.AuthorName),
-			Email:          aws.String(m.AuthorEmail),
 		}
 		mergeSquash(c, squashMergeInput)
 	case "ThreeWay":
 		threeWayMergeInput := &codecommit.MergePullRequestByThreeWayInput{
 			PullRequestId:  aws.String(m.PRID),
 			RepositoryName: aws.String(m.Repository),
-			SourceCommitId: aws.String(m.SourceCommit),
-			AuthorName:     aws.String(m.AuthorName),
-			Email:          aws.String(m.AuthorEmail),
 		}
 		mergeThreeWay(c, threeWayMergeInput)
 	}

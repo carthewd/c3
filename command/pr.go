@@ -360,10 +360,8 @@ func prMerge(cmd *cobra.Command, args []string) error {
 		mergeInput.Type = "FF"
 	} else if flag, _ := cmd.Flags().GetBool("threeway"); flag && opts.ThreeWay {
 		mergeInput.Type = "ThreeWay"
-		log.Fatal("Only FastForward merge supported.")
 	} else if flag, _ := cmd.Flags().GetBool("squash"); flag && opts.Squash {
 		mergeInput.Type = "Squash"
-		log.Fatal("Only FastForward merge supported.")
 	} else {
 		var availOpts []string
 		if opts.FF {
