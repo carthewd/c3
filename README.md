@@ -9,7 +9,7 @@ This is still in the very early stages of development
 
 ## Usage 
 
-- `c3 pr [approve, checkout, create, diff, list, mege, revoke]`
+- `c3 pr [approve, checkout, create, diff, list, merge, revoke]`
 - `c3 link [filepath | pr:123]`
 
 Note: merge will delete remote source branch unless `--delete-branch=false` is specified.
