@@ -17,10 +17,6 @@ type MockCodeCommitClient struct {
 	codecommitiface.CodeCommitAPI
 }
 
-type mockPullRequestOutput struct {
-	ApprovalRules []*string `json: "`
-}
-
 func (m *MockCodeCommitClient) ListPullRequests(input *codecommit.ListPullRequestsInput) (*codecommit.ListPullRequestsOutput, error) {
 	file, _ := ioutil.ReadFile("../../tests/fixtures/pr_list.json")
 	prListOutput := mockListPullRequestsOutput{}
