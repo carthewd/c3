@@ -2,9 +2,10 @@ package mocks
 
 import (
 	"encoding/json"
+	"io/ioutil"
+
 	"github.com/aws/aws-sdk-go/service/codecommit"
 	"github.com/aws/aws-sdk-go/service/codecommit/codecommitiface"
-	"io/ioutil"
 )
 
 type mockListPullRequestsOutput struct {
@@ -14,6 +15,10 @@ type mockListPullRequestsOutput struct {
 
 type MockCodeCommitClient struct {
 	codecommitiface.CodeCommitAPI
+}
+
+type mockPullRequestOutput struct {
+	ApprovalRules []*string `json: "`
 }
 
 func (m *MockCodeCommitClient) ListPullRequests(input *codecommit.ListPullRequestsInput) (*codecommit.ListPullRequestsOutput, error) {
@@ -41,5 +46,14 @@ func (m *MockCodeCommitClient) GetPullRequest(input *codecommit.GetPullRequestIn
 			return mockOutput[i], err
 		}
 	}
+	return mockOutput[0], err
+}
+
+func (m *MockCodeCommitClient) CreatePullRequest(input *codecommit.CreatePullRequestInput) (*codecommit.CreatePullRequestOutput, error) {
+	file, _ := ioutil.ReadFile("../../tests/fixtures/pr_details_new.json")
+
+	var mockOutput []*codecommit.CreatePullRequestOutput
+	err := json.Unmarshal([]byte(file), &mockOutput)
+
 	return mockOutput[0], err
 }
