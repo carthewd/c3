@@ -29,6 +29,7 @@ func init() {
 	prCmd.AddCommand(prApprovalCmd)
 	prCmd.AddCommand(prRevokeCmd)
 	prCmd.AddCommand(prMergeCmd)
+	prCmd.AddCommand(prCloseCmd)
 
 	prListCmd.Flags().StringP("author", "a", "", "Show <state> pull requests for repository by author (defaults to all)")
 	prListCmd.Flags().StringP("state", "s", "open", "Show all <state> PRs for repository")
@@ -146,6 +147,19 @@ var prMergeCmd = &cobra.Command{
 		return nil
 	},
 	RunE: prMerge,
+}
+
+var prCloseCmd = &cobra.Command{
+	Use:     "close [pull request ID]",
+	Aliases: []string{"cl", "c"},
+	Short:   "Close a pull request",
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("Requires a CodeCommit pull request number. ")
+		}
+		return nil
+	},
+	RunE: prClose,
 }
 
 func prList(cmd *cobra.Command, args []string) error {
@@ -381,4 +395,22 @@ func prMerge(cmd *cobra.Command, args []string) error {
 	fmt.Printf("Pull request %s merged successfully.\n", pr.ID)
 
 	return nil
+}
+
+func prClose(cmd *cobra.Command, args []string) error {
+	profile, err := cmd.Flags().GetString("profile")
+	if err != nil {
+		return err
+	}
+
+	c := awsclient.NewClient(profile)
+
+	_, err = codecommit.ClosePR(c, args[0])
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Pull request %s closed.\n", args[0])
+	return err
 }
