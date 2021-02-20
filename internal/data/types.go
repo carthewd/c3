@@ -51,13 +51,26 @@ type MergeInput struct {
 	Type               string
 	PRID               string
 	SourceCommit       string
-	SourceBranch	   string
+	SourceBranch       string
 	Repository         string
 	ConflictDetail     string
 	ConflictResolution string
 	AuthorName         string
 	AuthorEmail        string
-	DeleteBranch 	   bool
+	DeleteBranch       bool
+}
+
+type RepoDetails struct {
+	Name string
+	//DefaultBranch string
+	CloneSSH     string
+	CloneHTTP    string
+	LastModified string
+	//Description   string
+}
+
+type AllRepoDetails struct {
+	Repos []RepoDetails
 }
 
 // TableData Interface for dynamically creating tables with table_maker.go
@@ -95,6 +108,32 @@ func (p PullRequests) GetRows() [][]string {
 	for _, pr := range p.PRs {
 		var newRow []string
 		v := reflect.ValueOf(pr)
+		for i := 0; i < v.NumField(); i++ {
+			newRow = append(newRow, v.Field(i).Interface().(string))
+		}
+		allRows = append(allRows, newRow)
+	}
+
+	return allRows
+}
+
+// GetHeaders implements the TableData interface to generate tables for PullRequest objects
+func (r AllRepoDetails) GetHeaders() []string {
+	val := reflect.ValueOf(r.Repos[0])
+	var headers []string
+	for i := 0; i < val.Type().NumField(); i++ {
+		headers = append(headers, val.Type().Field(i).Name)
+	}
+
+	return headers
+}
+
+// GetRows implements the TableData interface to generate tables for PullRequest objects
+func (r AllRepoDetails) GetRows() [][]string {
+	var allRows [][]string
+	for _, repo := range r.Repos {
+		var newRow []string
+		v := reflect.ValueOf(repo)
 		for i := 0; i < v.NumField(); i++ {
 			newRow = append(newRow, v.Field(i).Interface().(string))
 		}
